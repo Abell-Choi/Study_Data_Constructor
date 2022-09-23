@@ -10,22 +10,12 @@ node *head; // making head in globla
 
 void createNode(int data);               // add node (= <python> list.add)
 void insertNode(int location, int data); // insert node in next input location
+void deleteNode(int index);
 int getNodeLength();                     // get list nodes length
 node getNodeIndexData(int index);
 void printNode(); // printing all nodes data
 
 int main() {
-  // if (head == NULL) { printf("asdf"); }
-  // making default data
-  for (int i = 0; i < 10; i++) {
-    createNode(i);
-  }
-
-  // printing node
-  printNode();
-  int length = getNodeLength();
-  getNodeIndexData(0);
-  // insertNode(1, 100);
 }
 
 // creating node function <in python List.add()>
@@ -36,11 +26,47 @@ void createNode(int data) {
   head = tmp;
 }
 
-// (wip) insert node in next input location
-void insertNode(int location, int data) {
-  node *moveTemp = malloc(sizeof(node));
-  moveTemp->data = data;
-  moveTemp->next = NULL;
+void insertNode(int index, int data){
+  //making head pos
+  node *tmp = head;
+  printf("head - %d\n" , head->data);    // Debug
+  node *nodeData = malloc(sizeof(node)); // making new node 
+  if (index == 0){                       // 0 = prev
+    nodeData -> data = data;             // insert front data
+    nodeData -> next = head;
+    head = nodeData;                     // head = nodeData
+  }
+
+  for (int i = 0 ; i < index-1 ; i++){   // move to target prev
+    tmp = tmp->next;
+  }
+  nodeData -> data = data;               // make node 
+  nodeData -> next = tmp->next;          // next = target
+  tmp->next = nodeData;                  // target -1 = nodeData
+  return;
+}
+
+//delete node
+void deleteNode(int index){
+  node *tmp = head;  // making head pos
+  if (index == 0){   // delete prev
+    head = tmp -> next;
+    free(tmp);
+    return;
+  }
+
+  // move to target prev point
+  for (int i = 0 ; i < index-1 ; i++){
+    tmp = tmp -> next;
+  }
+
+  // tmp1 = target-1 -> next = target pos
+  // tmp->next = target +2 pos
+  node* tmp1 = tmp->next;
+  tmp->next = tmp1->next;
+
+  // 대상 포인터 메모리 프리
+  free(tmp1);
 }
 
 // custom utility functions
@@ -73,7 +99,7 @@ node getNodeIndexData(int index) {
     index--;
     moveTemp = moveTemp->next;
   }
-  printf("Data -> %d", moveTemp->data);
+  // printf("Data -> %d", moveTemp->data);
   return *moveTemp;
 }
 
