@@ -8,108 +8,154 @@ typedef struct Node {
 } node;
 node *head; // making head in globla
 
-void createNode(int data);               // add node (= <python> list.add)
-void insertNode(int location, int data); // insert node in next input location
+void createNode(int data); // add node (= <python> list.add)
+void unshiftNode();
+void shiftNode(int data);
+void insertNode(int index, int data);
 void deleteNode(int index);
-int getNodeLength();                     // get list nodes length
-node getNodeIndexData(int index);
-void printNode(); // printing all nodes data
+void reverseNode();
+void printingNode();
+int getLength();
+int getLastIndexNum();
 
-int main() {
+void createSeq(int value) {
+  for (int i = 0; i < value; i++) {
+    createNode(i);
+  }
+  return;
 }
 
-// creating node function <in python List.add()>
+int main() {
+  head = NULL;
+  createSeq(10);
+  unshiftNode();
+  printingNode();
+  printf("\n%d", getLength());
+}
+
+// making node in last position
 void createNode(int data) {
+  // making node data
   node *tmp = malloc(sizeof(node));
+  tmp->data = data;
+  tmp->next = NULL;
+
+  // no head data
+  if (head == NULL) {
+    head = tmp;
+    return;
+  }
+
+  // head exists
+  node *pos = head;
+  while (pos->next != NULL) { // move last position
+    pos = pos->next;
+  }
+
+  pos->next = tmp; // lastPosition -> Next = tmp;
+  return;
+}
+
+void unshiftNode() {
+  node *pos = head->next;
+  free(head);
+  head = pos;
+}
+
+void shiftNode(int data) { // insert node in first node
+  node *tmp = malloc(sizeof(node));
+  // no list data
+  if (head == NULL) {
+    return createNode(data);
+  }
+
   tmp->data = data;
   tmp->next = head;
   head = tmp;
 }
 
-void insertNode(int index, int data){
-  //making head pos
-  node *tmp = head;
-  printf("head - %d\n" , head->data);    // Debug
-  node *nodeData = malloc(sizeof(node)); // making new node 
-  if (index == 0){                       // 0 = prev
-    nodeData -> data = data;             // insert front data
-    nodeData -> next = head;
-    head = nodeData;                     // head = nodeData
+void insertNode(int index, int data) { // insert data next of index
+  node *pos = head;
+  while (pos->next != NULL && index > 0) {
+    index--;
+    pos = pos->next;
   }
 
-  for (int i = 0 ; i < index-1 ; i++){   // move to target prev
-    tmp = tmp->next;
+  // last position
+  if (pos->next == NULL) {
+    return createNode(data);
   }
-  nodeData -> data = data;               // make node 
-  nodeData -> next = tmp->next;          // next = target
-  tmp->next = nodeData;                  // target -1 = nodeData
+
+  // insert node
+  node *tmp = malloc(sizeof(node));
+  tmp->next = pos->next;
+  tmp->data = data;
+  pos->next = tmp;
   return;
 }
 
-//delete node
-void deleteNode(int index){
-  node *tmp = head;  // making head pos
-  if (index == 0){   // delete prev
-    head = tmp -> next;
-    free(tmp);
-    return;
+void deleteNode(int index) {
+  node *pos = head;
+  if (index == 0) {
+    return unshiftNode();
+  }
+  if (getLastIndexNum() < index) {
+    index = getLastIndexNum();
   }
 
-  // move to target prev point
-  for (int i = 0 ; i < index-1 ; i++){
-    tmp = tmp -> next;
-  }
-
-  // tmp1 = target-1 -> next = target pos
-  // tmp->next = target +2 pos
-  node* tmp1 = tmp->next;
-  tmp->next = tmp1->next;
-
-  // 대상 포인터 메모리 프리
-  free(tmp1);
-}
-
-// custom utility functions
-
-int getNodeLength() { // return global linked list length
-  node *temp = head;
-  int i = 0;
-  while (temp != NULL) {
-    i++;
-    temp = temp->next;
-    // printf("console i check -> %d\n", i);
-  }
-  printf("max length -> %d \n", i);
-  return i;
-}
-
-node getNodeIndexData(int index) {
-  // 최대 길이 확인
-  int max_length = getNodeLength();
-  // max_length <= index) 이면 최대 길이로 지정
-  if (max_length <= index) {
-    index = max_length - 1;
-  }
-  if (index < 0) {
-    index = 0;
-  }
-
-  node *moveTemp = head;
-  while (index > 0) {
+  while (index > 1) {
+    pos = pos->next;
     index--;
-    moveTemp = moveTemp->next;
   }
-  // printf("Data -> %d", moveTemp->data);
-  return *moveTemp;
+  node *target = pos->next;
+  pos->next = target->next;
+  free(target);
+  return;
 }
 
-// printing node function
-void printNode() {
-  node *temp = head;
-  printf("List : ");
-  while (temp != NULL) {
-    printf("%d ", temp->data);
-    temp = temp->next;
+void reverseNode() {
+  // making position grid (prev, pos, next)
+  node *prev = NULL;
+  node *pos = head;
+  node *next = head->next;
+
+  // pos == null -> last data;
+  while (pos != NULL) {
+    pos->next = prev;
+    prev = pos;
+    pos = next;
+    next = next->next;
+  }
+
+  // null data is not node type,
+  // but prev is node type;
+  head = prev;
+  return;
+}
+
+void printingNode() { // printing all node data
+  node *pos = head;
+  printf("Printing all nodes ->");
+  while (pos != NULL) {
+    printf("%d ", pos->data);
+    pos = pos->next;
   }
   printf("\n");
+  return;
+}
+
+int getLength() { // get lists node count
+  node *pos = head;
+  int stack = 0;
+  while (pos != NULL) {
+    pos = pos->next;
+    stack++;
+  }
+
+  return stack;
+}
+
+int getLastIndexNum() // get lists index range
+{
+  return getLength() - 1;
 }
